@@ -1,9 +1,9 @@
 import requests
 import smtplib
 
-MY_EMAIL = "YOUR MAIL"
-MY_PASSWORD = "MAIL PASSWORD"
-TARGET_MAIL = "TARGET MAIL"
+MY_EMAIL = "YOUR MAIL@mail.com"
+MY_PASSWORD = "YOUR PASSWORD"
+
 
 def send_mail():
     with smtplib.SMTP("smtp.gmail.com", 587) as connection:
@@ -11,7 +11,7 @@ def send_mail():
         connection.login(MY_EMAIL, MY_PASSWORD)
         connection.sendmail(
             from_addr=MY_EMAIL,
-            to_addrs="TARGET_MAIL",
+            to_addrs="TARGET MAIL@mail.com",
             msg="Subject:NOK stronk"
                 "\n"
                 "\n"
@@ -19,12 +19,18 @@ def send_mail():
         )
 
 
-API_ENDPOINT = "https://api.apilayer.com/currency_data/convert"
-API_KEY = "YOUR API KEY"
 
+NEW_ENDPOINT = "https://api.currencyapi.com/v3/latest"
+NEW_API_KEY = "YOUR KEY"
 
 headers = {
     "apikey": API_KEY
+}
+
+new_parameters = {
+    "apikey": NEW_API_KEY,
+    "base_currency": "NOK",
+    "currencies": ["SEK"]
 }
 
 parameters = {
@@ -33,12 +39,14 @@ parameters = {
     "to": "SEK"
 }
 
-response = requests.get(url=API_ENDPOINT, headers=headers, params=parameters)
+response = requests.get(url=NEW_ENDPOINT, params=new_parameters)
+
 response.raise_for_status()
 
 exchange = response.json()
-target = exchange["result"]
+target = exchange["data"]["SEK"]["value"]
 
 
-if target > 100.5:
+
+if target > 1.005:
     send_mail()
